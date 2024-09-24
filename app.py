@@ -8,7 +8,7 @@ import os
 # Initialize YOLO model
 @st.cache_resource
 def load_model():
-    return YOLO('C:/Users/Keerthivasan/Desktop/InstaDataHelp Analytics/object_detection/yolov8n.pt')
+    return YOLO('yolov8n.pt')
 
 model = load_model()
 
