@@ -5,7 +5,6 @@ from ultralytics import YOLO
 import tempfile
 import os
 
-# Initialize YOLO model
 @st.cache_resource
 def load_model():
     return YOLO('yolov8n.pt')
@@ -25,10 +24,7 @@ def detect_objects_in_video(video_path):
     frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     fps = cap.get(cv2.CAP_PROP_FPS)
-
-    # Use a common codec (H.264 / 'avc1')
     fourcc = cv2.VideoWriter_fourcc(*'avc1')
-    # Create a temporary file to store the output video
     out_path = tempfile.NamedTemporaryFile(delete=False, suffix='.mp4').name
     out = cv2.VideoWriter(out_path, fourcc, fps, (frame_width, frame_height))
 
@@ -46,8 +42,6 @@ def detect_objects_in_video(video_path):
 
         accumulated_frame = np.mean(frame_buffer, axis=0).astype(np.uint8)
         frame_buffer.pop(0)
-
-        # YOLO object detection on each frame
         results = model(accumulated_frame, conf=0.5, iou=0.5)
         
         detected_frame = results[0].plot()
@@ -81,8 +75,6 @@ if upload_type == "Image":
                 if st.button("Detect Objects"):
                     result_image = detect_objects_in_image(image)
                     st.image(result_image, caption="Detection Result", use_column_width=True)
-            
-            # Clean up the temporary file
             os.unlink(tmp_file_path)
         except Exception as e:
             st.error(f"An error occurred: {str(e)}")
@@ -102,10 +94,8 @@ else:
                     result_video_path = detect_objects_in_video(tmp_file_path)
                     
                 if result_video_path:
-                    # Display the processed video using st.video()
                     st.video(result_video_path)
 
-                    # Optionally, provide a download link for the video
                     with open(result_video_path, "rb") as video_file:
                         video_bytes = video_file.read()
                         st.download_button(
@@ -114,11 +104,7 @@ else:
                             file_name="detected_video.mp4",
                             mime="video/mp4"
                         )
-                    
-                    # Clean up the processed video file
                     os.unlink(result_video_path)
-            
-            # Clean up the temporary uploaded video file
             os.unlink(tmp_file_path)
         except Exception as e:
             st.error(f"An error occurred: {str(e)}")
